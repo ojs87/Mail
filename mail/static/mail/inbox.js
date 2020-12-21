@@ -81,6 +81,7 @@ function load_mailbox(mailbox) {
              element.style.border = "1px solid black";
              element.style.padding= "5px";
              element.id="email" + i;
+             element.classList.add("email");
              elementsender.style.width="200px";
              elementdate.style.float="right";
              elementsubject.style.display="inline";
@@ -110,10 +111,16 @@ function load_mailbox(mailbox) {
                   })
                   if (mailbox === 'inbox') {
                      const button = document.createElement('button');
+                     const replybutton = document.createElement('button');
                      button.innerHTML = "Archive";
+                     replybutton.innerHTML = "Reply";
                      button.id = "archive";
+                     replybutton.id = "reply";
                      button.classList.add("btn", "btn-sm", "btn-outline-primary");
+                     replybutton.classList.add("btn", "btn-sm", "btn-outline-primary");
                      document.querySelector('#emails-open').append(button);
+                     document.querySelector('#emails-open').append(" ");
+                     document.querySelector('#emails-open').append(replybutton);
                      document.querySelector('#archive').addEventListener('click', function() {
                         fetch('/emails/' + item.id, {
                            method: 'PUT',
@@ -123,6 +130,17 @@ function load_mailbox(mailbox) {
                         })
                         fetch('/emails/inbox').then(response => response.json()).then(emails => load_mailbox('inbox'))
                      });
+                     document.querySelector('#reply').addEventListener('click', function() {
+                        document.querySelector('#emails-open').style.display = 'none';
+                        document.querySelector('#compose-view').style.display = 'block';
+                        document.querySelector('#compose-recipients').value = item.sender;
+                        if (item.subject.startsWith("Re: ")) {
+                           document.querySelector('#compose-subject').value = item.subject;
+                        } else {
+                           document.querySelector('#compose-subject').value = "Re: " + item.subject;
+                        }
+                        document.querySelector('#compose-body').value = "On " + item.timestamp + ", " + item.sender + " wrote: \n\n" + item.body;
+                     })
                   }
                   if (mailbox === 'archive') {
                      const button = document.createElement('button');
